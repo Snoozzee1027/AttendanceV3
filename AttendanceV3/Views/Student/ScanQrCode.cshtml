@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "Scan QR Code Attendance";
+    var sessionId = ViewBag.SessionId ?? 0;
+    var subject = ViewBag.Subject ?? "Unknown Subject";
+    var classSection = ViewBag.ClassSection ?? "Unknown Section";
+    var yearLevel = ViewBag.YearLevel ?? "Unknown Level";
+    var deviceId = ViewBag.DeviceId ?? "";
+}
+
+<h2>Scan QR Code for @subject - @classSection</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success mt-2">
+        @TempData["Message"]
+        <br />
+        <a asp-action="Dashboard" class="btn btn-primary mt-2">Go to Dashboard</a>
+    </div>
+}
+else
+{
+    <form id="qrRegisterForm" asp-action="RegisterStudent" method="post">
+        <input type="hidden" name="sessionId" value="@sessionId" />
+        <input type="hidden" name="deviceId" id="deviceIdInput" value="@deviceId" />
+        <input type="hidden" name="fullName" id="fullNameInput" />
+        <input type="hidden" name="studentEmail" id="emailInput" />
+    </form>
+
+    <div class="form-group mt-2">
+        <label>Full Name</label>
+        <input type="text" id="fullNameField" class="form-control" required />
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Email</label>
+        <input type="email" id="emailField" class="form-control" required />
+    </div>
+
+    <button class="btn btn-success mt-3" onclick="submitQrForm()">Register & Attend</button>
+
+    <hr />
+    <small class="text-muted">
+        Your device will be linked. Future attendance will auto-record if using the same device.
+    </small>
+
+    <script>
+        let deviceId = localStorage.getItem("deviceId");
+        if (!deviceId) {
+            deviceId = crypto.randomUUID?.() || Math.random().toString(36).substring(2) + Date.now().toString(36);
+            localStorage.setItem("deviceId", deviceId);
+        }
+        document.getElementById("deviceIdInput").value = deviceId;
+
+        const savedName = localStorage.getItem("studentName");
+        const savedEmail = localStorage.getItem("studentEmail");
+        if (savedName) document.getElementById("fullNameField").value = savedName;
+        if (savedEmail) document.getElementById("emailField").value = savedEmail;
+
+        function submitQrForm() {
+            const name = document.getElementById("fullNameField").value;
+            const email = document.getElementById("emailField").value;
+
+            if (!name || !email) { alert("Please complete all fields."); return; }
+
+            document.getElementById("fullNameInput").value = name;
+            document.getElementById("emailInput").value = email;
+
+            localStorage.setItem("studentName", name);
+            localStorage.setItem("studentEmail", email);
+
+            document.getElementById("qrRegisterForm").submit();
+        }
+    </script>
+}

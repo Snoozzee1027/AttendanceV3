@@ -1,0 +1,32 @@
+﻿@model IEnumerable<AttendanceV3.Models.AttendanceRecord>
+
+<h2>My Attendance</h2>
+
+@if (!Model.Any())
+{
+    <p>No attendance records yet.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Class Section</th>
+                <th>Year Level</th>
+                <th>Time In</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in Model)
+            {
+                <tr>
+                    <td>@record.AttendanceSession?.Subject</td>
+                    <td>@record.AttendanceSession?.ClassSection</td>
+                    <td>@record.AttendanceSession?.YearLevel</td>
+                    <td>@record.TimeIn.ToLocalTime().ToString("g")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

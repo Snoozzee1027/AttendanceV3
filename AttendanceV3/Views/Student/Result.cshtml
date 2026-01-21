@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "Attendance Result";
+}
+
+<h2>Attendance Result</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success mt-2">
+        @TempData["Message"]
+    </div>
+}
+
+<a asp-action="Dashboard" class="btn btn-primary mt-3">Go to Dashboard</a>

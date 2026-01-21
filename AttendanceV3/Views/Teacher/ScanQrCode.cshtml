@@ -1,0 +1,166 @@
+﻿@model AttendanceV3.Models.AttendanceSessions
+
+@{
+    ViewData["Title"] = "Scan QR Attendance";
+}
+
+<style>
+    body {
+        position: relative;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: mediumseagreen;
+    }
+
+        /* Background logo watermark */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 25%;
+            left: 10%;
+            transform: translate(-50%, -50%);
+            width: 3500px; /* adjust live as needed */
+            height: 2500px;
+            background: url('/images/logo.png') no-repeat center center;
+            background-size: contain;
+            opacity: 0.28; /* faint watermark */
+            pointer-events: none;
+            z-index: 0;
+        }
+
+    .container {
+        position: relative;
+        z-index: 1;
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 30px;
+        text-align: center;
+    }
+
+    #qrImage {
+        max-width: 250px;
+        margin: 20px auto;
+        display: block;
+        border: 7px solid #007bff;
+        border-radius: 10px;
+        padding: 10px;
+        background: #fff;
+    }
+
+    #scanCount {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    th, td {
+        padding: 10px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .btn-dashboard {
+        margin-top: 20px;
+    }
+</style>
+
+<div class="container">
+    <h2>Scan QR Code - @Model.Subject (@Model.ClassSection - @Model.YearLevel)</h2>
+
+    <p>Scan this QR code with your device:</p>
+
+    <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=@ViewBag.QRUrl" alt="QR Code" />
+
+    <p class="mt-2">Students scanned: <span id="scanCount">0</span></p>
+
+    <!-- Live student table -->
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Student Name</th>
+                <th>Time Scanned</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- dynamically filled by JS -->
+        </tbody>
+    </table>
+
+    <a asp-action="Dashboard" class="btn btn-secondary btn-dashboard">Back to Dashboard</a>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.7/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/attendanceHub")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        let studentCounter = 0;
+
+        // Update scanned count
+        connection.on("ReceiveScanCount", (sessionId, count) => {
+            if (sessionId === @Model.Id) {
+                document.getElementById("scanCount").innerText = count;
+            }
+        });
+
+        // Add scanned student to table
+        connection.on("ReceiveStudentName", (sessionId, studentName) => {
+            if (sessionId === @Model.Id) {
+                studentCounter++;
+                const tbody = document.querySelector("#studentTable tbody");
+                const tr = document.createElement("tr");
+
+                const tdIndex = document.createElement("td");
+                tdIndex.textContent = studentCounter;
+
+                const tdName = document.createElement("td");
+                tdName.textContent = studentName;
+
+                const tdTime = document.createElement("td");
+                tdTime.textContent = new Date().toLocaleTimeString();
+
+                tr.appendChild(tdIndex);
+                tr.appendChild(tdName);
+                tr.appendChild(tdTime);
+
+                tbody.appendChild(tr);
+            }
+        });
+
+        async function startConnection() {
+            try {
+                await connection.start();
+                console.log("SignalR Connected.");
+            } catch (err) {
+                console.error(err);
+                setTimeout(startConnection, 5000);
+            }
+        }
+
+        startConnection();
+    </script>
+}

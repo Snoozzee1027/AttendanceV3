@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Attendance Recorded";
+}
+
+<h2>Attendance Recorded</h2>
+
+<p>
+    Thank you. Your attendance was successfully recorded on:
+</p>
+
+<p>
+    <strong>@ViewBag.Date</strong> at <strong>@ViewBag.Time</strong>
+</p>
+
+<a asp-action="Dashboard" class="btn btn-primary">
+    Back to Dashboard
+</a>

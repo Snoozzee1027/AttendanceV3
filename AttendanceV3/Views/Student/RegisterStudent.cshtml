@@ -1,0 +1,34 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Register Device";
+    string deviceId = ViewBag.DeviceId as string;
+    int sessionId = ViewBag.SessionId;
+    string subject = ViewBag.Subject as string;
+    string classSection = ViewBag.ClassSection as string;
+    string yearLevel = ViewBag.YearLevel as string;
+}
+
+<h2>Register Your Device</h2>
+
+<p>
+    Session: <strong>@subject</strong> <br />
+    Class: <strong>@classSection</strong> <br />
+    Year: <strong>@yearLevel</strong>
+</p>
+
+<form asp-action="RegisterStudent" method="post">
+    <input type="hidden" name="deviceId" value="@deviceId" />
+    <input type="hidden" name="sessionId" value="@sessionId" />
+
+    <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input type="text" name="fullName" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="studentEmail">Email</label>
+        <input type="email" name="studentEmail" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Register & Attend</button>
+</form>

@@ -1,0 +1,57 @@
+﻿@model IEnumerable<AttendanceV3.Models.StudentDevices>
+
+@{
+    ViewData["Title"] = "Unenroll Students";
+}
+
+<style>
+    /* Fixed back button */
+    .btn-back-dashboard {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    table {
+        margin-top: 80px; /* add space so table isn't hidden behind the fixed button */
+    }
+</style>
+
+<!-- Back to Dashboard button -->
+<a asp-controller="Teacher" asp-action="Dashboard" class="btn btn-secondary btn-back-dashboard">
+    Back to Dashboard
+</a>
+
+<h2>Unenroll Students</h2>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-primary">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>IP Address</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Model)
+        {
+            <tr>
+                <td>@student.StudentName</td>
+                <td>@student.StudentEmail</td>
+                <td>@student.IpAddress</td>
+                <td>
+                    <form asp-controller="Teacher" asp-action="RemoveStudent" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="recordId" value="@student.Id" />
+                        <button class="btn btn-sm btn-danger"
+                                onclick="return confirm('Are you sure you want to unenroll @student.StudentName?');">
+                            Unenroll
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,49 @@
+﻿@model AttendanceV3.Models.AttendanceSessions
+
+<h2>Students for @Model.Subject (@Model.ClassSection - @Model.YearLevel)</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Time Scanned</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.AttendanceRecords != null && Model.AttendanceRecords.Any())
+        {
+            int counter = 1;
+            foreach (var record in Model.AttendanceRecords)
+            {
+                <tr>
+                    <td>@counter</td>
+                    <td>@record.StudentName</td>
+                    <td>@record.StudentEmail</td>
+                    <td>@record.TimeIn.ToLocalTime()</td>
+                    <td>
+                        <form asp-controller="Teacher" asp-action="RemoveStudent" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="recordId" value="@record.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Are you sure you want to remove @record.StudentName?');">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                counter++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center">No students scanned yet.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Dashboard" class="btn btn-secondary mt-3">Back to Dashboard</a>
